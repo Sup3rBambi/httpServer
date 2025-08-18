@@ -11,7 +11,8 @@ endif
 
 compile:
 	$(mkdir_command)
-	clang $(wildcard $(source_dir)/*.c) -o $(target_path)
+	clang $(wildcard $(source_dir)/*.c) -o $(target_path) -Wall -Werror -ggdb
+	cp -r pages $(target_dir)/
 
 run: compile
 	@echo ================ RUNNING =================

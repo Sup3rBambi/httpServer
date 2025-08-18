@@ -1,4 +1,7 @@
 #include "server.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 int socket_id = 0;
 int client_id = 0;
@@ -19,7 +22,6 @@ void initServ() {
     }
 
     printf("Initiation completed\n");
-    connectClient();
 }
 
 void connectClient() {
@@ -30,10 +32,41 @@ void connectClient() {
 
     printf("Client connected\n");
 
-    char msg[] = "Hello world! from the server";
-    sendMsg(msg, sizeof(msg));
+    sendHomePage();
 }
 
-void sendMsg(const char* msg, size_t length) {
+void sendHomePage() {
+    char* homePage = readFile("pages/index.html");
+    if (homePage == NULL) {
+        printf("index.html not found\n");
+        sendMsg("Server error");
+        return;
+    }
+    sendMsg(homePage);
+    free(homePage);
+}
+
+char* readFile(const char* filename) {
+    FILE* file = fopen(filename, "r");
+    if (file == NULL) {
+        return NULL;
+    }
+
+    fseek(file, 0, SEEK_END);
+    unsigned long size = ftell(file);
+    fseek(file, 0, SEEK_SET);
+    char* content = (char*)malloc(sizeof(char) * size);
+    fread(content, sizeof(char), size, file);
+    fclose(file);
+    return content;
+}
+
+void sendMsg(const char* content) {
+    const char* header = "HTTP/1.1 200 Ok\r\nContent-Type: text/html\r\n\r\n";
+    unsigned long msgLen = strlen(content) + strlen(header) + 1;
+    char* msg = (char*)malloc(msgLen);
+    strcpy(msg, header);
+    strcat(msg, content);
+    size_t length = msgLen;
     send(client_id, msg, length, 0);
 }

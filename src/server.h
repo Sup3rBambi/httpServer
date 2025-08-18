@@ -1,8 +1,9 @@
 #ifndef SERVER
 #define SERVER
 
-#include <stddef.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
 
@@ -10,6 +11,8 @@
 
 void initServ();
 void connectClient();
-void sendMsg(const char* msg, size_t lenth);
+void sendHomePage();
+char* readFile(const char* filename);
+void sendMsg(const char* msg);
 
 #endif
