@@ -14,5 +14,6 @@ void connectClient();
 void sendHomePage();
 char* readFile(const char* filename);
 void sendMsg(const char* msg);
+void sendHtml(const char* msg);
 
 #endif

@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/socket.h>
 
 int socket_id = 0;
 int client_id = 0;
@@ -39,10 +40,10 @@ void sendHomePage() {
     char* homePage = readFile("pages/index.html");
     if (homePage == NULL) {
         printf("index.html not found\n");
-        sendMsg("Server error");
+        sendMsg("page not found");
         return;
     }
-    sendMsg(homePage);
+    sendHtml(homePage);
     free(homePage);
 }
 
@@ -61,12 +62,20 @@ char* readFile(const char* filename) {
     return content;
 }
 
-void sendMsg(const char* content) {
+void sendMsg(const char *msg) {
+    send(client_id, msg, strlen(msg), 0);
+}
+
+void sendHtml(const char* body) {
     const char* header = "HTTP/1.1 200 Ok\r\nContent-Type: text/html\r\n\r\n";
-    unsigned long msgLen = strlen(content) + strlen(header) + 1;
+
+    unsigned long msgLen = strlen(body) + strlen(header) + 1;
     char* msg = (char*)malloc(msgLen);
     strcpy(msg, header);
-    strcat(msg, content);
+    strcat(msg, body);
+
     size_t length = msgLen;
     send(client_id, msg, length, 0);
+
+    free(msg);
 }
